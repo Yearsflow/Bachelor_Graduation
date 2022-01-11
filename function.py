@@ -4,9 +4,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import AdaBoostClassifier
-from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score,recall_score,f1_score
 
 def transform_label(df):
