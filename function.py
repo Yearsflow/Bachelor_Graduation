@@ -16,11 +16,14 @@ def transform_label(df):
         df['label'][i]=label[df['label'][i]]
     return df
 
-def TPE_MLmodels(classifier,train_X,train_Y,test_X,test_Y,classifier_name):
-    classifier.fit(train_X,train_Y)
-    result=classifier.predict(test_X)
-    print(classifier_name+':')
+def evaluate(result,test_Y):
     print('Accuracy:',accuracy_score(test_Y,result))
     print('Recall:',recall_score(test_Y,result,average='macro'))
-    print('F1:',f1_score(test_Y,result,average='macro'))  
+    print('F1:',f1_score(test_Y,result,average='macro'))
+
+def TP_MLmodels(classifier,train_X,train_Y,test_X,test_Y,classifier_name):
+    classifier.fit(train_X,train_Y)
+    result=classifier.predict(test_X)
+    print(classifier_name+':')  
+    evaluate(result,test_Y)
     return result
