@@ -15,6 +15,10 @@ def index():
 def show_user_profile(username):
     return f'User {escape(username)}'
 
+@app.errorhandler(404)
+def error(e):
+    return render_template('404.html'),404
+
 @app.route('/login',methods=['GET','POST'])
 def login():
     if request.method=='GET':
