@@ -26,4 +26,4 @@ def TP_MLmodels(classifier,train_X,train_Y,test_X,test_Y,classifier_name):
     result=classifier.predict(test_X)
     print(classifier_name+':')  
     evaluate(result,test_Y)
-    return result
+    return classifier,result
