@@ -1,7 +1,8 @@
+from urllib.parse import urlparse
 from app import app,db
 from app.tables import administrator,users
 from flask import render_template,request,flash,redirect,url_for
-from flask_login import current_user,login_user,logout_user,login_required
+from flask_login import current_user,login_user,logout_user,login_required,login_manager
 from importlib_metadata import re
 from markupsafe import escape
 from .config import Config
@@ -21,6 +22,11 @@ def error(e):
 
 @app.route('/login',methods=['GET','POST'])
 def login():
+    if current_user.is_authenticated:
+        if isinstance(current_user._get_current_object(),administrator):
+            return redirect(url_for('admin_index'))
+        elif isinstance(current_user._get_current_object(),users):
+            return redirect(url_for('user_index'))
     if request.method=='GET':
         return render_template('login.html')
     if request.method=='POST':
@@ -41,10 +47,14 @@ def login():
             elif not user.check_password(Password):
                 error='密码错误！'
             if error is None:
+                login_user(user)
+                next_page=request.args.get('next')
+                if not next_page or urlparse(next_page).netloc!='':
+                    next_page=url_for('index')
                 if is_admin:
-                    return render_template('admin.html')
+                    return redirect(url_for('admin_index'))
                 else:
-                    return render_template('user.html')
+                    return redirect(url_for('user_index'))
             flash(error)
         if submit_register=='submit':
             data=users(Name=UserName,Email=Email,Password=Password)
@@ -52,3 +62,24 @@ def login():
             db.session.commit()
             flash('注册成功！')
     return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+@app.route('/admin_index')
+@login_required
+def admin_index():
+    if isinstance(current_user._get_current_object(),administrator):
+        return render_template('admin.html')
+    else:
+        logout_user()
+
+@app.route('/user_index')
+@login_required
+def user_index():
+    if isinstance(current_user._get_current_object(),users):
+        return render_template('user.html')
+    else:
+        logout_user()

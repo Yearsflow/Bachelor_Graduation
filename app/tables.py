@@ -1,6 +1,15 @@
-from app import db
+from app import db,login
+from flask_login import UserMixin
 
-class administrator(db.Model):
+@login.user_loader
+def load_user(user_id):
+    t=users.query.get(int(user_id))
+    if t is None:
+        return administrator.query.get(int(user_id))
+    else:
+        return t
+
+class administrator(UserMixin,db.Model):
     Id=db.Column(db.Integer,primary_key=True,autoincrement=True)
     Name=db.Column(db.String(10),nullable=False)
     Email=db.Column(db.String(20),nullable=False)
@@ -10,7 +19,7 @@ class administrator(db.Model):
     def check_password(self,password):
         return self.Password==password
 
-class users(db.Model):
+class users(UserMixin,db.Model):
     Id=db.Column(db.Integer,primary_key=True,autoincrement=True)
     Name=db.Column(db.String(8),nullable=False)
     Email=db.Column(db.String(20),nullable=False)
