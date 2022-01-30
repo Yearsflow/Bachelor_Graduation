@@ -4,7 +4,7 @@ from flask_login import UserMixin
 @login.user_loader
 def load_user(user_id):
     t=users.query.get(int(user_id))
-    if t is None:
+    if int(user_id)>=100:
         return administrator.query.get(int(user_id))
     else:
         return t

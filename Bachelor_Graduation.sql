@@ -8,7 +8,7 @@ create table administrator (
 ) ENGINE=InnoDB default charset=utf8 collate=utf8_unicode_ci;
 
 lock tables administrator write;
-insert into administrator values (1,'admin','admin@tust.edu.cn','admin');
+insert into administrator values (100,'admin','admin@tust.edu.cn','admin');
 unlock tables;
 
 drop table if exists users;
