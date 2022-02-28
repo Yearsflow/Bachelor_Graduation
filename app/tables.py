@@ -18,6 +18,8 @@ class administrator(UserMixin,db.Model):
         return self.Id
     def check_password(self,password):
         return self.Password==password
+    def set_password(self,password):
+        self.Password=password
 
 class users(UserMixin,db.Model):
     Id=db.Column(db.Integer,primary_key=True,autoincrement=True)
@@ -28,3 +30,19 @@ class users(UserMixin,db.Model):
         return self.Id
     def check_password(self,password):
         return self.Password==password
+    def set_password(self,password):
+        self.Password=password
+
+class news(db.Model):
+    Id=db.Column(db.Integer,primary_key=True,autoincrement=True)
+    Category=db.Column(db.String(20),nullable=False)
+    Content=db.Column(db.Text,nullable=False)
+    def get_id(self):
+        return self.Id
+
+class favorite(db.Model):
+    Id=db.Column(db.Integer,primary_key=True,autoincrement=True)
+    UserId=db.Column(db.Integer,db.ForeignKey('users.Id'),nullable=False)
+    NewsId=db.Column(db.Integer,db.ForeignKey('news.Id'),nullable=False)
+    def get_id(self):
+        return self.Id

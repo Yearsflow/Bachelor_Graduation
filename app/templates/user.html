@@ -1,10 +1,50 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>user</title>
+        <title>{{current_user.Name}}</title>
+		<link rel="stylesheet" type="text/css" href="../static/css/user.css">
     </head>
     <body>
-        <p>{{current_user.Name}}</p>
-        <a href="{{url_for('logout')}}">logout</a>
+        <div id="menu">
+			<div class="hamburger">
+				<div class="line"></div>
+				<div class="line"></div>
+				<div class="line"></div>
+			</div>
+			<div class="menu-inner">	
+				<ul>
+					<li><a href="{{url_for('clean')}}">新闻数据清洗</a></li>
+					<li><a href="{{url_for('classify')}}">新闻标题类别预测</a></li>
+					<li><a href="{{url_for('keywords')}}">新闻关键词提取</a></li>
+					<li><a href="{{url_for('test')}}">Test</a></li>
+					<li>Menu Item</li>
+					<li><a href="{{url_for('user_info')}}">用户信息</a></li>
+				</ul>
+			</div>			
+			<svg version="1.1" id="blob"xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+				<path id="blob-path" d="M60,500H0V0h60c0,0,20,172,20,250S60,900,60,500z"/>
+			</svg>
+		</div>	
+		<h1>Welcome , {{current_user.Name}}</h1>
+        <div class="faq-container">
+            {% if articles %}
+                {% for article in articles %}
+                <div class="faq">
+                    <h3 class="faq-title">
+                        {{article.Content}}
+                    </h3>
+                    <p class="faq-text">
+                        {{article.Category}}
+                    </p>
+                    <button class="faq-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+		<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+		<script src="../static/js/user.js"></script>
     </body>
 </html>

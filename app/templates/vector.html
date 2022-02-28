@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>vector</title>
+    </head>
+    <body>
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/qna"></script>
+        <script>
+            qna.load().then(model => {
+                model.findAnswers(question,passage).then(answers => {
+                    console.log('Answers：',answers);
+                })
+            })
+        </script>
+    </body>
+</html>

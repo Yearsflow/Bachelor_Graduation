@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+        <link rel="stylesheet" href="../static/css/style.css" />
+        <title>test</title>
+    </head>
+    <body>
+        <h1>test</h1>
+        <div class="faq-container">
+            {% if articles %}
+                {% for article in articles %}
+                <div class="faq">
+                    <h3 class="faq-title">
+                        {{article.Content}}
+                    </h3>
+                    <p class="faq-text">
+                        {{article.Category}}
+                    </p>
+                    <button class="faq-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <script src="../static/js/script.js"></script>
+    </body>
+</html>

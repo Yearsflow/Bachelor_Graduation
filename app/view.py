@@ -1,12 +1,15 @@
 from urllib.parse import urlparse
+from graphviz import render
 from app import app,db
-from app.tables import administrator,users
+from app.tables import administrator,users,news,favorite
 from flask import render_template,request,flash,redirect,url_for
 from flask_login import current_user,login_user,logout_user,login_required,login_manager
 from importlib_metadata import re
 from markupsafe import escape
 from .config import Config
 from flask_sqlalchemy import SQLAlchemy
+from .clean import clean_text
+from .keywords import extract_keywords_model
 
 @app.route('/')
 def index():
@@ -15,6 +18,25 @@ def index():
 @app.route('/user/<username>')
 def show_user_profile(username):
     return f'User {escape(username)}'
+
+@app.route('/clean',methods=['GET','POST'])
+@login_required
+def clean():
+    if request.method=='GET':
+        return render_template('clean.html')
+    if request.method=='POST':
+        text=request.form.get('clean_text')
+        text=clean_text(text)
+        clean_button=request.form.get('clean')
+        if clean_button=='clean':
+            return render_template('clean.html',data=text)
+        return redirect(url_for('user_index'))
+
+@app.route('/vector',methods=['GET','POST'])
+@login_required
+def vector():
+    if request.method=='GET':
+        return render_template('vector.html')
 
 @app.errorhandler(404)
 def error(e):
@@ -80,6 +102,54 @@ def admin_index():
 @login_required
 def user_index():
     if isinstance(current_user._get_current_object(),users):
-        return render_template('user.html')
+        articles=news.query.all()
+        return render_template('user.html',articles=articles)
     else:
         logout_user()
+
+@app.route('/classify',methods=['GET','POST'])
+@login_required
+def classify():
+    if request.method=='GET':
+        return render_template('classify.html')
+
+@app.route('/user_info/<int:change>',methods=['GET','POST'])
+@app.route('/user_info',defaults={'change':0},methods=['GET','POST'])
+@login_required
+def user_info(change):
+    if request.method=='POST':
+        old_password=request.form['oldpassword']
+        new_password=request.form['newpassword']
+        new_password2=request.form['newpassword2']
+        if not new_password==new_password2:
+            flash('两次密码输入不一致！')
+        elif not current_user.check_password(old_password):
+            flash('原密码输入错误！')
+        else:
+            current_user.set_password(new_password)
+            db.session.commit()
+            flash('Your changes have been saved.')
+        return redirect(url_for('user_info'))
+    return render_template('user_info.html',change=change)
+
+@app.route('/keywords',methods=['GET','POST'])
+@login_required
+def keywords():
+    if request.method=='GET':
+        return render_template('keywords.html')
+    if request.method=='POST':
+        text=request.form.get('news_text')
+        model=extract_keywords_model()
+        keywords=model.extract_keywords(text,keyphrase_ngram_range=(1,1),stop_words=None,top_n=10)
+        clean_button=request.form.get('extract')
+        if clean_button=='extract':
+            return render_template('keywords.html',data=keywords)
+        return redirect(url_for('user_index'))
+    
+
+@app.route('/test',methods=['GET','POST'])
+@login_required
+def test():
+    if request.method=='GET':
+        data=news.query.all()
+        return render_template('test.html',articles=data)

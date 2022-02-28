@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{current_user.Name}}</title>
+    </head>
+    <body>
+        {% if not change %}
+        <p>用户名：{{current_user.Name}}</p>
+        <p>电子邮箱：{{current_user.Email}}</p>
+        <p>
+            <a href="{{url_for('user_info',change=1)}}" role="button">修改密码</a>
+        </p>
+        {% else %}
+        <form action="" method="post">
+            <h1>修改密码</h1>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+                <div role="alert">
+                    <strong>{{message}}</strong>
+                </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+            <div>
+                <label for="inputText">原密码</label>
+                <input type="password" name="oldpassword" placeholder="Old Password" required autofocus>         
+            </div>
+            <div>
+                <label for="inputPassword">新密码</label>
+                <input type="password" name="newpassword" placeholder="New Password" required>
+            </div>
+            <div>
+                <label for="inputPassword">再次新密码</label>
+                <input type="password" name="newpassword2" placeholder="Repeat Password" required>
+            </div>
+            <button type="submit">确认修改</button>
+        </form>
+        {% endif %}
+    </body>
+</html>

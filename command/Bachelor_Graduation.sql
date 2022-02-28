@@ -1,3 +1,5 @@
+set global local_infile=on;
+
 drop table if exists administrator;
 create table administrator (
 	Id int(11) collate utf8_unicode_ci not null auto_increment,
@@ -24,3 +26,24 @@ lock tables users write;
 insert into users values (1,'test','test@tust.edu.cn','123456');
 insert into users values (2,'DCrusher','yearsflow@126.com','123456');
 unlock tables;
+
+drop table if exists news;
+create table news (
+	Id int(11) collate utf8_unicode_ci not null auto_increment,
+	Category varchar(20) collate utf8_unicode_ci not null,
+	Content text collate utf8_unicode_ci not null,
+	primary key (Id)
+) ENGINE=InnoDB default charset=utf8 collate=utf8_unicode_ci;
+lock tables news write;
+load data local infile 'D:/Bachelor_Graduation/data/dev.txt' into table news(Category,Content);
+unlock tables;
+
+drop table if exists favorite;
+create table favorite (
+	Id int(11) collate utf8_unicode_ci not null auto_increment,
+	UserId int(11) collate utf8_unicode_ci not null,
+	NewsId int(11) collate utf8_unicode_ci not null,
+	primary key (Id),
+	foreign key (UserId) references users(Id),
+	foreign key (NewsId) references news(Id)
+) ENGINE=InnoDB default charset=utf8 collate=utf8_unicode_ci;
