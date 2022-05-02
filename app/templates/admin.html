@@ -1,10 +1,178 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>admin</title>
+        <title>{{current_user.Name}}</title>
+        <meta http-equiv="Content-Type" content="text/javascript; charset=utf-8" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+		<link rel="stylesheet" type="text/css" href="../static/css/admin.css">
+        <link rel="stylesheet" type="text/css" href="../static/css/simplePagination.css">
+        <link rel="stylesheet" type="text/css" href="../static/css/hl.css">
     </head>
     <body>
-        <p>{{current_user.Name}}</p>
-        <a href="{{url_for('logout')}}">logout</a>
+        <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+        <script type="text/javascript">
+            Content=[];
+            Category=[];
+            {% if articles %}
+                {% for article in articles %}
+                    Content.push('{{article.Content}}');
+                    Category.push('{{article.Category}}');
+                {% endfor %}
+            {% endif %}
+        </script>
+        <div id="menu">
+			<div class="hamburger">
+				<div class="line"></div>
+				<div class="line"></div>
+				<div class="line"></div>
+			</div>
+			<div class="menu-inner">	
+				<ul>
+					<li><a href="{{url_for('clean')}}">文本清洗</a></li>
+					<li><a href="{{url_for('detect')}}">文本敏感词过滤</a></li>
+					<li><a href="{{url_for('keywords')}}">文本关键词提取</a></li>
+					<li><a href="{{url_for('vector')}}">文本向量化</a></li>
+					<li><a href="{{url_for('show')}}">可视化展示</a></li>
+					<li><a href="{{url_for('user_info')}}">用户信息</a></li>
+				</ul>
+			</div>			
+			<svg version="1.1" id="blob"xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+				<path id="blob-path" d="M60,500H0V0h60c0,0,20,172,20,250S60,900,60,500z"/>
+			</svg>
+		</div>	
+		<h1>Welcome , {{current_user.Name}}</h1>
+        <div class="content">
+            <div class="faq-container">
+                <div class="faq active">
+                    <h3 class="faq-title" id="cont1">{{articles[0].Content}}</h3>
+                    <p class="faq-text" id="cat1">{{articles[0].Category}}</p>
+                    <button class="faq-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+			<div class="faq-container">
+                <div class="faq">
+                    <h3 class="faq-title" id="cont2">{{articles[1].Content}}</h3>
+                    <p class="faq-text" id="cat2">{{articles[1].Category}}</p>
+                    <button class="faq-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+			<div class="faq-container">
+                <div class="faq">
+                    <h3 class="faq-title" id="cont3">{{articles[2].Content}}</h3>
+                    <p class="faq-text" id="cat3">{{articles[2].Category}}</p>
+                    <button class="faq-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+			<div class="faq-container">
+                <div class="faq">
+                    <h3 class="faq-title" id="cont4">{{articles[3].Content}}</h3>
+                    <p class="faq-text" id="cat4">{{articles[3].Category}}</p>
+                    <button class="faq-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+			<div class="faq-container">
+                <div class="faq">
+                    <h3 class="faq-title" id="cont5">{{articles[4].Content}}</h3>
+                    <p class="faq-text" id="cat5">{{articles[4].Category}}</p>
+                    <button class="faq-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="pagination-holder clearfix">
+				<div id="light-pagination" class="pagination light-theme simple-pagination">
+					<ul>
+						<li class="disabled">
+							<span class="current prev">Prev</span>
+						</li>
+						<li class="active">
+							<span class="current">1</span>
+						</li>
+						<li>
+							<a href="#page-2" class="page-link">2</a>
+						</li>
+						<li>
+							<a href="#page-3" class="page-link">3</a>
+						</li>
+						<li>
+							<a href="#page-4" class="page-link">4</a>
+						</li>
+						<li>
+							<a href="#page-5" class="page-link">5</a>
+						</li>
+						<li class>
+							<span class="ellipse clickable">...</span>
+						</li>
+						<li>
+							<a href="#page-19" class="page-link">19</a>
+						</li>
+						<li>
+							<a href="#page-20" class="page-link">20</a>
+						</li>
+						<li>
+							<a href="#page-2" class="page-link next">Next</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+        </div>
+        <script type="text/javascript" src="../static/js/hl-all.js"></script>
+        <script type="text/javascript" src="../static/js/jquery.simplePagination.js"></script>
+		<script src="../static/js/admin.js"></script>
+        <script type="text/javascript">
+            var listener=document.getElementById('light-pagination');
+            listener.addEventListener('click',showContent,false);
+            function showContent() {
+                var a = $("#light-pagination").pagination('getCurrentPage');
+				var cont1 = document.getElementById('cont1');
+				var cont2 = document.getElementById('cont2');
+				var cont3 = document.getElementById('cont3');
+				var cont4 = document.getElementById('cont4');
+				var cont5 = document.getElementById('cont5');
+				var cat1 = document.getElementById('cat1');
+				var cat2 = document.getElementById('cat2');
+				var cat3 = document.getElementById('cat3');
+				var cat4 = document.getElementById('cat4');
+				var cat5 = document.getElementById('cat5');
+				for (var i = 5*(a-1); i < 5*a; i++) {
+					if (i%5 == 0) {
+						cont1.innerHTML=Content[i];
+						cat1.innerHTML=Category[i];
+					}
+					else if (i%5 == 1) {
+						cont2.innerHTML=Content[i];
+						cat2.innerHTML=Category[i];
+					}
+					else if (i%5 == 2) {
+						cont3.innerHTML=Content[i];
+						cat3.innerHTML=Category[i];
+					}
+					else if (i%5 == 3) {
+						cont4.innerHTML=Content[i];
+						cat4.innerHTML=Category[i];
+					}
+					else {
+						cont5.innerHTML=Content[i];
+						cat5.innerHTML=Category[i];
+					}
+				}
+            }
+        </script>
+        <form action="" method="post">
+            <input class="logout" type="submit" name="logout" value="logout">
+        </form>
     </body>
 </html>

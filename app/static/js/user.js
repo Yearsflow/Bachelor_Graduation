@@ -1,6 +1,6 @@
 $(window).load(function(){
 	var height = window.innerHeight,
-  x= 0, y= height/2,
+ 	x = 0, y = height/2,
 	curveX = 10,
 	curveY = 0,
 	targetX = 0,
@@ -15,7 +15,6 @@ $(window).load(function(){
 
 	$(this).on('mousemove', function(e){
 		x = e.pageX;
-		
 		y = e.pageY;
 	});
 
@@ -82,10 +81,30 @@ $(window).load(function(){
 	
 });
 
-const toggles = document.querySelectorAll('.faq-toggle')
+const toggles = document.querySelectorAll('.faq-toggle');
 
 toggles.forEach(toggle => {
     toggle.addEventListener('click', () => {
         toggle.parentNode.classList.toggle('active')
     })
-})
+});
+
+DlHighlight.HELPERS.highlightByName("code", "pre");
+
+$('#light-pagination').pagination({
+	pages: 20,
+	cssStyle: 'light-theme'
+});
+
+$('#dark-pagination').pagination({
+	pages: 20,
+	cssStyle: 'dark-theme',
+	displayedPages: 3,
+	edges: 3
+});
+
+$('#compact-pagination').pagination({
+	pages: 70,
+	cssStyle: 'compact-theme',
+	displayedPages: 7
+});

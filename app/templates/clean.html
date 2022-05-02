@@ -2,16 +2,15 @@
 <html>
     <head>
         <title>clean</title>
+        <link rel="stylesheet" href="../static/css/clean.css" />
     </head>
     <body>
         <div>
 			<form action="" method="post">
-				<input type="text" name="clean_text">
-				<input type="submit" name="clean" value="clean">
+				<textarea id="FromText" type="text" name="clean_text" placeholder="Input your origin text"></textarea>
+				<input class="btn" type="submit" name="clean" value="clean">
+                <textarea id="ToText">{{data}}</textarea>
 			</form>
-		</div>
-        <div>
-            <p>{{data}}</p>
         </div>
     </body>
 </html>

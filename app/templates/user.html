@@ -2,9 +2,47 @@
 <html>
     <head>
         <title>{{current_user.Name}}</title>
+        <meta http-equiv="Content-Type" content="text/javascript; charset=utf-8" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
 		<link rel="stylesheet" type="text/css" href="../static/css/user.css">
+        <link rel="stylesheet" type="text/css" href="../static/css/simplePagination.css">
+        <link rel="stylesheet" type="text/css" href="../static/css/hl.css">
     </head>
     <body>
+        <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+        <script type="text/javascript">
+            Content=[];
+            Category=[];
+			Collection=[];
+            {% if articles %}
+                {% for article in articles %}
+                    Content.push('{{article.Content}}');
+                    Category.push('{{article.Category}}');
+                {% endfor %}
+            {% endif %}
+			{% if CollectionNews %}
+				{% for item in CollectionNews %}
+					Collection.push({{item.NewsId}});
+				{% endfor %}
+			{% endif %}
+        </script>
+		<svg viewBox="0 0 0 0" style="position: absolute; z-index: -1; opacity: 0;">
+			<defs>
+			  <linearGradient id="boxGradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="25" y2="25">
+				<stop offset="0%"   stop-color="#27FDC7"/>
+				<stop offset="100%" stop-color="#0FC0F5"/>
+			  </linearGradient>
+		  
+			  <linearGradient id="lineGradient">
+				<stop offset="0%"    stop-color="#0FC0F5"/>
+				<stop offset="100%"  stop-color="#27FDC7"/>
+			  </linearGradient>
+		  
+			  <path id="todo__box" stroke="url(#boxGradient)" d="M21 12.7v5c0 1.3-1 2.3-2.3 2.3H8.3C7 20 6 19 6 17.7V7.3C6 6 7 5 8.3 5h10.4C20 5 21 6 21 7.3v5.4"></path>
+			  <path id="todo__check" stroke="url(#boxGradient)" d="M10 13l2 2 5-5"></path>
+			  <circle id="todo__circle" cx="13.5" cy="12.5" r="10"></circle>
+			</defs>
+		</svg>
         <div id="menu">
 			<div class="hamburger">
 				<div class="line"></div>
@@ -13,11 +51,11 @@
 			</div>
 			<div class="menu-inner">	
 				<ul>
-					<li><a href="{{url_for('clean')}}">新闻数据清洗</a></li>
-					<li><a href="{{url_for('classify')}}">新闻标题类别预测</a></li>
-					<li><a href="{{url_for('keywords')}}">新闻关键词提取</a></li>
-					<li><a href="{{url_for('test')}}">Test</a></li>
-					<li>Menu Item</li>
+					<li><a href="{{url_for('classify')}}">新闻分类预测</a></li>
+					<li><a href="{{url_for('keywords')}}">微博主题提取</a></li>
+					<li><a href="{{url_for('detect')}}">垃圾内容检测</a></li>
+					<li><a href="{{url_for('emotional')}}">评论情感分析</a></li>
+					<li><a href="{{url_for('show')}}">可视化展示</a></li>
 					<li><a href="{{url_for('user_info')}}">用户信息</a></li>
 				</ul>
 			</div>			
@@ -26,25 +64,220 @@
 			</svg>
 		</div>	
 		<h1>Welcome , {{current_user.Name}}</h1>
-        <div class="faq-container">
-            {% if articles %}
-                {% for article in articles %}
-                <div class="faq">
-                    <h3 class="faq-title">
-                        {{article.Content}}
-                    </h3>
-                    <p class="faq-text">
-                        {{article.Category}}
-                    </p>
-                    <button class="faq-toggle">
-                        <i class="fas fa-chevron-down"></i>
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                {% endfor %}
-            {% endif %}
+        <div class="content">
+			<label class="todo">
+				<input class="todo__state" type="checkbox" name="check0" value="0" />
+				
+				<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 200 25" class="todo__icon">
+				  <use xlink:href="#todo__box" class="todo__box"></use>
+				  <use xlink:href="#todo__check" class="todo__check"></use>
+				  <use xlink:href="#todo__circle" class="todo__circle"></use>
+				</svg>
+			
+				<div class="faq-container">
+					<div class="faq active">
+						<h3 class="faq-title" id="cont1">{{articles[0].Content}}</h3>
+						<p class="faq-text" id="cat1">{{articles[0].Category}}</p>
+						<button class="faq-toggle">
+							<i class="fas fa-chevron-down"></i>
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+				</div>
+				
+			</label>
+
+			<label class="todo">
+				<input class="todo__state" type="checkbox" name="check1" value="1" />
+				
+				<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 200 25" class="todo__icon">
+				  <use xlink:href="#todo__box" class="todo__box"></use>
+				  <use xlink:href="#todo__check" class="todo__check"></use>
+				  <use xlink:href="#todo__circle" class="todo__circle"></use>
+				</svg>
+				<div class="faq-container">
+                	<div class="faq">
+                    	<h3 class="faq-title" id="cont2">{{articles[1].Content}}</h3>
+                    	<p class="faq-text" id="cat2">{{articles[1].Category}}</p>
+                    	<button class="faq-toggle">
+                        	<i class="fas fa-chevron-down"></i>
+                        	<i class="fas fa-times"></i>
+                    	</button>
+                	</div>
+            	</div>
+			</label>
+
+			<label class="todo">
+				<input class="todo__state" type="checkbox" name="check2" value="2" />
+				
+				<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 200 25" class="todo__icon">
+				  <use xlink:href="#todo__box" class="todo__box"></use>
+				  <use xlink:href="#todo__check" class="todo__check"></use>
+				  <use xlink:href="#todo__circle" class="todo__circle"></use>
+				</svg>
+				<div class="faq-container">
+                	<div class="faq">
+                    	<h3 class="faq-title" id="cont3">{{articles[2].Content}}</h3>
+                    	<p class="faq-text" id="cat3">{{articles[2].Category}}</p>
+                    	<button class="faq-toggle">
+                        	<i class="fas fa-chevron-down"></i>
+                        	<i class="fas fa-times"></i>
+                    	</button>
+                	</div>
+            	</div>
+			</label>
+
+			<label class="todo">
+				<input class="todo__state" type="checkbox" name="check3" value="3" />
+				
+				<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 200 25" class="todo__icon">
+				  <use xlink:href="#todo__box" class="todo__box"></use>
+				  <use xlink:href="#todo__check" class="todo__check"></use>
+				  <use xlink:href="#todo__circle" class="todo__circle"></use>
+				</svg>
+				<div class="faq-container">
+                	<div class="faq">
+                    	<h3 class="faq-title" id="cont4">{{articles[3].Content}}</h3>
+                    	<p class="faq-text" id="cat4">{{articles[3].Category}}</p>
+                    	<button class="faq-toggle">
+                        	<i class="fas fa-chevron-down"></i>
+                        	<i class="fas fa-times"></i>
+                    	</button>
+                	</div>
+            	</div>
+			</label>
+
+			<label class="todo">
+				<input class="todo__state" type="checkbox" name="check4" value="4" />
+				
+				<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="h	ttp://www.w3.org/1999/xlink" viewBox="0 0 200 25" class="todo__icon">
+				  <use xlink:href="#todo__box" class="todo__box"></use>
+				  <use xlink:href="#todo__check" class="todo__check"></use>
+				  <use xlink:href="#todo__circle" class="todo__circle"></use>
+				</svg>
+				<div class="faq-container">
+                	<div class="faq">
+                    	<h3 class="faq-title" id="cont5">{{articles[4].Content}}</h3>
+                    	<p class="faq-text" id="cat5">{{articles[4].Category}}</p>
+                    	<button class="faq-toggle">
+                        	<i class="fas fa-chevron-down"></i>
+                        	<i class="fas fa-times"></i>
+                    	</button>
+                	</div>
+            	</div>
+			</label>
+
+            <div class="pagination-holder clearfix">
+				<div id="light-pagination" class="pagination light-theme simple-pagination">
+					<ul>
+						<li class="disabled">
+							<span class="current prev">Prev</span>
+						</li>
+						<li class="active">
+							<span class="current">1</span>
+						</li>
+						<li>
+							<a href="#page-2" class="page-link">2</a>
+						</li>
+						<li>
+							<a href="#page-3" class="page-link">3</a>
+						</li>
+						<li>
+							<a href="#page-4" class="page-link">4</a>
+						</li>
+						<li>
+							<a href="#page-5" class="page-link">5</a>
+						</li>
+						<li class>
+							<span class="ellipse clickable">...</span>
+						</li>
+						<li>
+							<a href="#page-19" class="page-link">19</a>
+						</li>
+						<li>
+							<a href="#page-20" class="page-link">20</a>
+						</li>
+						<li>
+							<a href="#page-2" class="page-link next">Next</a>
+						</li>
+					</ul>
+				</div>
+			</div>
         </div>
-		<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+        <script type="text/javascript" src="../static/js/hl-all.js"></script>
+        <script type="text/javascript" src="../static/js/jquery.simplePagination.js"></script>
 		<script src="../static/js/user.js"></script>
+		<script type="text/javascript">
+			function FindNewsId(NewsList, NewsId) {
+				for (var i = 0; i < NewsList.length; i++) {
+					if (NewsList[i] == NewsId.toString()) return true;
+				}
+				return false;
+			}
+		</script>
+        <script type="text/javascript">
+            var listener=document.getElementById('light-pagination');
+            listener.addEventListener('click',showContent,false);
+			var News = document.querySelectorAll('.todo__state');
+			for (var i = 0; i < News.length; i++) {
+				if (FindNewsId(Collection, News[i].value)) {
+					News[i].checked = true;
+				}
+				else {
+					News[i].checked = false;
+				}
+			}
+            function showContent() {
+                var a = $("#light-pagination").pagination('getCurrentPage');
+				var CollectionNews = document.querySelectorAll('.todo__state');
+				for (var i = 0; i < CollectionNews.length; i++) {
+					CollectionNews[i].value = (5*(a-1)+i).toString();
+				}
+				for (var i = 0; i < CollectionNews.length; i++) {
+					if (FindNewsId(Collection, CollectionNews[i].value)) {
+						CollectionNews[i].checked = true;
+					}
+					else {
+						CollectionNews[i].checked = false;
+					}
+				}
+				var cont1 = document.getElementById('cont1');
+				var cont2 = document.getElementById('cont2');
+				var cont3 = document.getElementById('cont3');
+				var cont4 = document.getElementById('cont4');
+				var cont5 = document.getElementById('cont5');
+				var cat1 = document.getElementById('cat1');
+				var cat2 = document.getElementById('cat2');
+				var cat3 = document.getElementById('cat3');
+				var cat4 = document.getElementById('cat4');
+				var cat5 = document.getElementById('cat5');
+				for (var i = 5*(a-1); i < 5*a; i++) {
+					if (i%5 == 0) {
+						cont1.innerHTML=Content[i];
+						cat1.innerHTML=Category[i];
+					}
+					else if (i%5 == 1) {
+						cont2.innerHTML=Content[i];
+						cat2.innerHTML=Category[i];
+					}
+					else if (i%5 == 2) {
+						cont3.innerHTML=Content[i];
+						cat3.innerHTML=Category[i];
+					}
+					else if (i%5 == 3) {
+						cont4.innerHTML=Content[i];
+						cat4.innerHTML=Category[i];
+					}
+					else {
+						cont5.innerHTML=Content[i];
+						cat5.innerHTML=Category[i];
+					}
+				}
+            }
+        </script>
+		<script type="text/javascript" src="../static/js/news.js"></script>
+		<form action="" method="post">
+            <input class="logout" type="submit" name="logout" value="logout">
+        </form>
     </body>
 </html>

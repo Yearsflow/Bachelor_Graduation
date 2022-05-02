@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>emotional</title>
+        <link rel="stylesheet" href="../static/css/emotional.css" />
+    </head>
+    <body>
+        <div>
+			<form action="" method="post">
+				<textarea id="FromText" type="text" name="emotional_text" placeholder="Please enter text to be analyzed"></textarea>
+				<input class="btn" type="submit" name="emotional" value="analyze">
+                {% if data %}
+                    <p class="sentiments">积极情绪值：{{data.sentiments}}</p>
+                    {% if data.sentiments >= 0.5 %}
+                        <p class="results">评论情感倾向：Positive</p>
+                    {% else %}
+                        <p class="results">评论情感倾向：Negative</p>
+                    {% endif %}
+                {% endif %}
+			</form>
+        </div>
+    </body>
+</html>

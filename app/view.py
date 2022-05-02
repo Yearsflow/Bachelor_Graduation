@@ -1,5 +1,6 @@
 from urllib.parse import urlparse
 from graphviz import render
+from numpy import isin
 from app import app,db
 from app.tables import administrator,users,news,favorite
 from flask import render_template,request,flash,redirect,url_for
@@ -8,8 +9,11 @@ from importlib_metadata import re
 from markupsafe import escape
 from .config import Config
 from flask_sqlalchemy import SQLAlchemy
-from .clean import clean_text
-from .keywords import extract_keywords_model
+from snownlp import SnowNLP
+from .filter import DFAFilter
+import joblib
+from . import pipeline
+import json
 
 @app.route('/')
 def index():
@@ -23,20 +27,39 @@ def show_user_profile(username):
 @login_required
 def clean():
     if request.method=='GET':
-        return render_template('clean.html')
+        if isinstance(current_user._get_current_object(),administrator):
+            return render_template('clean.html')
+        else:
+            logout_user()
+            return redirect(url_for('login'))
     if request.method=='POST':
         text=request.form.get('clean_text')
-        text=clean_text(text)
+        text=pipeline.clean(text)
         clean_button=request.form.get('clean')
         if clean_button=='clean':
             return render_template('clean.html',data=text)
-        return redirect(url_for('user_index'))
+        return redirect(url_for('admin_index'))
 
 @app.route('/vector',methods=['GET','POST'])
 @login_required
 def vector():
     if request.method=='GET':
-        return render_template('vector.html')
+        if isinstance(current_user._get_current_object(),administrator):
+            return render_template('vector.html')
+        else:
+            logout_user()
+            return redirect(url_for('login'))
+    if request.method=='POST':
+        text=request.form.get('vector_text')
+        tfidf=pipeline.vectorize(text).toarray()
+        res=''
+        for i in range(len(tfidf)):
+            for j in range(len(tfidf[i])):
+                res+=str(tfidf[i][j])+','
+        vector_button=request.form.get('vector')
+        if vector_button=='vector':
+            return render_template('vector.html',data=res)
+        return redirect(url_for('admin_index'))
 
 @app.errorhandler(404)
 def error(e):
@@ -90,28 +113,120 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route('/admin_index')
+@app.route('/admin_index',methods=['GET','POST'])
 @login_required
 def admin_index():
-    if isinstance(current_user._get_current_object(),administrator):
-        return render_template('admin.html')
-    else:
-        logout_user()
+    if request.method=='GET':
+        if isinstance(current_user._get_current_object(),administrator):
+            articles=news.query.limit(100).all()
+            for i in range(len(articles)):
+                articles[i].Content=articles[i].Content.strip('\r')
+            return render_template('admin.html',articles=articles)
+        else:
+            logout_user()
+            return redirect(url_for('login'))
+    if request.method=='POST':
+        submit_logout=request.form.get('logout')
+        if submit_logout=='logout':
+            logout_user()
+            return redirect(url_for('login'))
 
-@app.route('/user_index')
+@app.route('/user_index',methods=['GET','POST'])
 @login_required
 def user_index():
-    if isinstance(current_user._get_current_object(),users):
-        articles=news.query.all()
-        return render_template('user.html',articles=articles)
-    else:
-        logout_user()
+    if request.method=='GET':
+        if isinstance(current_user._get_current_object(),users):
+            articles=news.query.limit(100).all()
+            CollectionNews=favorite.query.filter_by(UserId=current_user.Id).all()
+            for i in range(len(articles)):
+                articles[i].Content=articles[i].Content.strip('\r')
+            return render_template('user.html',articles=articles,CollectionNews=CollectionNews)
+        else:
+            logout_user()
+            return redirect(url_for('login'))
+    if request.method=='POST':
+        data = json.loads(request.form.get('data'))
+        news_id = data['id']
+        flag = data['flag']
+        if (flag):
+            record = favorite(UserId=current_user.Id, NewsId=news_id)
+            db.session.add(record)
+            db.session.commit()
+        else:
+            db.session.query(favorite).filter(favorite.UserId == current_user.Id, favorite.NewsId == news_id).delete()
+            db.session.commit()
+        submit_logout=request.form.get('logout')
+        if submit_logout=='logout':
+            logout_user()
+            return redirect(url_for('login'))
+        return redirect(url_for('user_index'))
+
+@app.route('/emotional',methods=['GET','POST'])
+@login_required
+def emotional():
+    if request.method=='GET':
+        if isinstance(current_user._get_current_object(),users):
+            return render_template('emotional.html')
+        else:
+            logout_user()
+            return redirect(url_for('login'))
+    if request.method=='POST':
+        text=request.form.get('emotional_text')
+        s=SnowNLP(text)
+        emotional_button=request.form.get('emotional')
+        if emotional_button=='analyze':
+            return render_template('emotional.html',data=s)
+        return redirect(url_for('user_index'))
+
+@app.route('/detect',methods=['GET','POST'])
+@login_required
+def detect():
+    if request.method=='GET':
+        if isinstance(current_user._get_current_object(),users):
+            return render_template('detect_user.html')
+        elif isinstance(current_user._get_current_object(),administrator):
+            return render_template('detect_admin.html')
+        else:
+            logout_user()
+            return redirect(url_for('login'))
+    if request.method=='POST':
+        text=request.form.get('detect_text')
+        gfw=DFAFilter()
+        gfw.parse('./train_text_data/sensitive_words.txt')
+        result=gfw.filter(text,"*")
+        flag=False
+        for i in result:
+            if i=='*':
+                flag=True
+                break
+        detect_button=request.form.get('detect')
+        if detect_button=='detect':
+            if isinstance(current_user._get_current_object(),users):
+                return render_template('detect_user.html',data=result,flag=flag)
+            if isinstance(current_user._get_current_object(),administrator):
+                return render_template('detect_admin.html',data=result)
+        if isinstance(current_user._get_current_object(),users):
+            return redirect(url_for('user_index'))
+        if isinstance(current_user._get_current_object(),administrator):
+            return redirect(url_for('admin_index'))
 
 @app.route('/classify',methods=['GET','POST'])
 @login_required
 def classify():
     if request.method=='GET':
-        return render_template('classify.html')
+        if isinstance(current_user._get_current_object(),users):
+            return render_template('classify.html')
+        else:
+            logout_user()
+            return redirect(url_for('login'))
+    if request.method=='POST':
+        text=request.form.get('classify_text')
+        classifier=request.form.get('classifier')
+        result=pipeline.predict_label(classifier,text)
+        classify_button=request.form.get('classify')
+        if classify_button=='classify':
+            return render_template('classify.html',data=result)
+        return redirect(url_for('user_index'))
 
 @app.route('/user_info/<int:change>',methods=['GET','POST'])
 @app.route('/user_info',defaults={'change':0},methods=['GET','POST'])
@@ -139,17 +254,25 @@ def keywords():
         return render_template('keywords.html')
     if request.method=='POST':
         text=request.form.get('news_text')
-        model=extract_keywords_model()
-        keywords=model.extract_keywords(text,keyphrase_ngram_range=(1,1),stop_words=None,top_n=10)
-        clean_button=request.form.get('extract')
-        if clean_button=='extract':
+        keywords=pipeline.keywords(text)
+        extract_button=request.form.get('extract')
+        if extract_button=='extract':
             return render_template('keywords.html',data=keywords)
-        return redirect(url_for('user_index'))
-    
+        return redirect(url_for('admin_index'))
 
-@app.route('/test',methods=['GET','POST'])
+@app.route('/show',methods=['GET','POST'])
 @login_required
-def test():
+def show():
     if request.method=='GET':
-        data=news.query.all()
-        return render_template('test.html',articles=data)
+        if isinstance(current_user._get_current_object(),users):
+            return render_template('show.html')
+        else:
+            logout_user()
+            return redirect(url_for('login'))
+    return redirect(url_for('user_index'))
+
+@app.route('/predict',methods=['GET','POST'])
+@login_required
+def predict():
+    if request.method=='GET':
+        return render_template('predict.html')

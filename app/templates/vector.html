@@ -2,16 +2,15 @@
 <html>
     <head>
         <title>vector</title>
+        <link rel="stylesheet" href="../static/css/vector.css">
     </head>
     <body>
-        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/qna"></script>
-        <script>
-            qna.load().then(model => {
-                model.findAnswers(question,passage).then(answers => {
-                    console.log('Answers：',answers);
-                })
-            })
-        </script>
+        <div>
+			<form action="" method="post">
+				<textarea id="FromText" type="text" name="vector_text" placeholder="Input your text to be vectorized"></textarea>
+				<input class="btn" type="submit" name="vector" value="vector">
+                <textarea id="ToText">{{data}}</textarea>
+			</form>
+        </div>
     </body>
 </html>

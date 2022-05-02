@@ -2,16 +2,16 @@
 <html>
     <head>
         <title>keywords</title>
+        <link rel="stylesheet" href="../static/css/keywords.css" />
     </head>
     <body>
         <div>
-            <form action="" method="post">
-                <input type="text" name="news_text">
-                <input type="submit" name="extract" value="extract">
-            </form>
-        </div>
-        <div>
-            <p>{{data}}</p>
+			<form action="" method="post">
+				<textarea id="FromText" type="text" name="news_text" placeholder="Input your news text"></textarea>
+				<input class="btn" type="submit" name="extract" value="extract">
+                <textarea id="ToText">{% if data %}{% for word in data %}
+{{word}}{% endfor %}{% endif %}</textarea>
+			</form>
         </div>
     </body>
 </html>
