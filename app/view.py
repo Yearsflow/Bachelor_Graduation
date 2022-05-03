@@ -145,6 +145,10 @@ def user_index():
             logout_user()
             return redirect(url_for('login'))
     if request.method=='POST':
+        submit_logout=request.form.get('logout')
+        if submit_logout=='logout':
+            logout_user()
+            return redirect(url_for('login'))
         data = json.loads(request.form.get('data'))
         news_id = data['id']
         flag = data['flag']
@@ -155,10 +159,6 @@ def user_index():
         else:
             db.session.query(favorite).filter(favorite.UserId == current_user.Id, favorite.NewsId == news_id).delete()
             db.session.commit()
-        submit_logout=request.form.get('logout')
-        if submit_logout=='logout':
-            logout_user()
-            return redirect(url_for('login'))
         return redirect(url_for('user_index'))
 
 @app.route('/emotional',methods=['GET','POST'])
@@ -233,18 +233,22 @@ def classify():
 @login_required
 def user_info(change):
     if request.method=='POST':
-        old_password=request.form['oldpassword']
-        new_password=request.form['newpassword']
-        new_password2=request.form['newpassword2']
-        if not new_password==new_password2:
-            flash('两次密码输入不一致！')
-        elif not current_user.check_password(old_password):
-            flash('原密码输入错误！')
+        if isinstance(current_user._get_current_object(),users):
+            old_password=request.form['oldpassword']
+            new_password=request.form['newpassword']
+            new_password2=request.form['newpassword2']
+            if not new_password==new_password2:
+                flash('两次密码输入不一致！')
+            elif not current_user.check_password(old_password):
+                flash('原密码输入错误！')
+            else:
+                current_user.set_password(new_password)
+                db.session.commit()
+                flash('Your changes have been saved.')
+            return redirect(url_for('user_info'))
         else:
-            current_user.set_password(new_password)
-            db.session.commit()
-            flash('Your changes have been saved.')
-        return redirect(url_for('user_info'))
+            logout_user()
+            return redirect(url_for('login'))
     return render_template('user_info.html',change=change)
 
 @app.route('/keywords',methods=['GET','POST'])
@@ -265,14 +269,61 @@ def keywords():
 def show():
     if request.method=='GET':
         if isinstance(current_user._get_current_object(),users):
-            return render_template('show.html')
+            data = {}
+            records = favorite.query.filter_by(UserId=current_user.Id).all()
+            category = []
+            num = []
+            for record in records:
+                new_category = news.query.filter_by(Id=record.NewsId+1).first()
+                ind = category.index(new_category.Category) if new_category.Category in category else -1
+                if ind == -1:
+                    category.append(new_category.Category)
+                    num.append(1)
+                else:
+                    num[ind] += 1
+            data['category'] = category
+            data['num'] = num
+            return render_template('show_user.html',data=data)
+        if isinstance(current_user._get_current_object(),administrator):
+            data = {}
+            records = news.query.limit(100).all()
+            category = []
+            num = []
+            for record in records:
+                ind = category.index(record.Category) if record.Category in category else -1
+                if ind == -1:
+                    category.append(record.Category)
+                    num.append(1)
+                else:
+                    num[ind] += 1
+            data['category'] = category
+            data['num'] = num
+            return render_template('show_admin.html',data=data)
+    else:
+        if isinstance(current_user._get_current_object(),users):
+            return redirect(url_for('user_index'))
+        else:
+            return redirect(url_for('admin_index'))
+
+@app.route('/admin_info/<int:change>',methods=['GET','POST'])
+@app.route('/admin_info',defaults={'change':0},methods=['GET','POST'])
+@login_required
+def admin_info(change):
+    if request.method=='POST':
+        if isinstance(current_user._get_current_object(),administrator):
+            old_password=request.form['oldpassword']
+            new_password=request.form['newpassword']
+            new_password2=request.form['newpassword2']
+            if not new_password==new_password2:
+                flash('两次密码输入不一致！')
+            elif not current_user.check_password(old_password):
+                flash('原密码输入错误！')
+            else:
+                current_user.set_password(new_password)
+                db.session.commit()
+                flash('Your changes have been saved.')
+            return redirect(url_for('admin_info'))
         else:
             logout_user()
             return redirect(url_for('login'))
-    return redirect(url_for('user_index'))
-
-@app.route('/predict',methods=['GET','POST'])
-@login_required
-def predict():
-    if request.method=='GET':
-        return render_template('predict.html')
+    return render_template('admin_info.html',change=change)

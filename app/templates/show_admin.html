@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>show</title>
+    </head>
+    <body>
+        <div id="pie" style="width: 1000px; height: 600px; margin: 0 auto; transform: translate(0, 20%);"></div>
+        <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+        <script type="text/javascript" src="../static/js/echarts.min.js"></script>
+        <script type="text/javascript">
+            var myChart = echarts.init(document.getElementById('pie'));
+            var app = {
+                x: [],
+                y: []
+            };
+            {% if data %}
+                {% for item in data.category %}
+                    app.x.push('{{item}}');
+                {% endfor %}
+                {% for item in data.num %}
+                    app.y.push({{item}});
+                {% endfor %}
+            {% endif %}
+            paint_data=[['Category','Number']];
+            tmp = [];
+            for (var i = 0; i < app.x.length; i++) {
+                tmp.push(app.x[i],app.y[i]);
+                paint_data.push(tmp);
+                tmp = [];
+            }
+            myChart.setOption({
+                title: {
+                            text: '后台新闻饼状图',
+                            left: 'center'
+                        },
+                        tooltip: {},
+                        legend: {
+                            data : app.x,
+                            type : 'scroll',
+                            orient: 'vertical',
+                            left: 'left'
+                        },
+                        dataset: {
+                            source: paint_data
+                        },
+                        xAxis: { type: 'category' },
+                        yAxis: {},
+                        series: [
+                            {
+                                type: 'pie',
+                                radius: '50%',
+                                emphasis: {
+                                    itemStyle: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                    }
+                                }
+                            }
+                        ]
+                    });
+        </script>
+    </body>
+</html>

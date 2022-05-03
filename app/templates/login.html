@@ -63,5 +63,10 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    {% for message in get_flashed_messages() %}
+        alert('{{message}}');
+    {% endfor %}
+</script>
 </body>
 </html>

@@ -8,7 +8,7 @@
         <p>用户名：{{current_user.Name}}</p>
         <p>电子邮箱：{{current_user.Email}}</p>
         <p>
-            <a href="{{url_for('user_info',change=1)}}" role="button">修改密码</a>
+            <a href="{{url_for('admin_info',change=1)}}" role="button">修改密码</a>
         </p>
         {% else %}
         <form action="" method="post">
