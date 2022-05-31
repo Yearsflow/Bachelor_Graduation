@@ -26,6 +26,14 @@ textarea {
   color: white;
 }
 
+p {
+  font-size: 17px;
+  position: absolute;
+  color: rgba(255,151,152);
+  right: 25%;
+  top: 17%;
+}
+
 #FromText {
   left: 20%;
   top: 20%;

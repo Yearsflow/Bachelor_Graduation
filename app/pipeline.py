@@ -67,7 +67,7 @@ def label2id(label):
     return label_df[label]
 
 def id2label(Id):
-    return list(label_df.keys())[list(label_df.values()).index(Id)]
+    return list(label_df.keys())[Id]
 
 def predict_label(model_name, text):
     model = joblib.load('./model/' + model_name + '.pkl')

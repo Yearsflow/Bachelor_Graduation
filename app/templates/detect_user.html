@@ -11,9 +11,9 @@
 				<input class="btn" type="submit" name="detect" value="detect">
                 {% if flag %}
                     {% if flag==True %}
-                        输入文本包含敏感词
+                        <p>输入文本包含敏感词</p>
                     {% else %}
-                        输入文本不包含敏感词
+                        <p>输入文本不包含敏感词</p>
                     {% endif %}
                 {% endif %}
                 <textarea id="ToText">{{data}}</textarea>
