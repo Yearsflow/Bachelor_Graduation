@@ -1,3 +1,7 @@
+drop database if exists bachelor_graduation;
+create database bachelor_graduation;
+use bachelor_graduation;
+
 set global local_infile=on;
 
 drop table if exists administrator;
@@ -36,7 +40,7 @@ create table news (
 	primary key (Id)
 ) ENGINE=InnoDB default charset=utf8 collate=utf8_unicode_ci;
 lock tables news write;
-load data local infile 'D:/Bachelor_Graduation/train_text_data/dev.txt' into table news(Category,Content);
+load data local infile 'D:/Bachelor_Graduation/data/dev.txt' into table news(Category,Content);
 unlock tables;
 
 set foreign_key_checks=0;
