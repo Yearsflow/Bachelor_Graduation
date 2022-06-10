@@ -10,9 +10,15 @@ __注意所有路径改为本地绝对路径！！__
 
 ## 一、系统环境配置
 
-Python：3.8.12
+Python：3.8.13
 
-Windows OS + MySQL Database
+操作系统：Windows
+
+数据库：MySQL
+
+Web框架：Flask
+
+模型训练：sklearn
 
 1.Anaconda创建虚拟环境
 
@@ -28,4 +34,14 @@ Windows OS + MySQL Database
 
 `mysql -u root -p --local-infile=1 < D:\Bachelor_Graduation\Bachelor_Graduation.sql`
 
-## 二、
+## 二、模型训练
+
+1.执行preprocess.ipynb
+
+2.目录下自动生成model文件夹，里面存放训练好的模型pkl格式文件
+
+## 三、系统启动
+
+运行命令`python main.py`，在浏览器端输入127.0.0.1:5000即可
+
+查看MySQL数据库中用户和管理员表可以得到用户名和密码，登录后可使用该系统

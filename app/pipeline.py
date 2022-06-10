@@ -8,9 +8,9 @@ from snownlp import SnowNLP
 import joblib
 import numpy as np
 
-file1='./train_text_data/中文停用词表.txt'
-file2='./train_text_data/哈工大停用词表.txt'
-file3='./train_text_data/四川大学机器智能实验室停用词库.txt'
+file1='./data/中文停用词表.txt'
+file2='./data/哈工大停用词表.txt'
+file3='./data/四川大学机器智能实验室停用词库.txt'
 label_df={'history':0,'military':1,'baby':2,'world':3,'tech':4,
         'game':5,'society':6,'sports':7,'travel':8,'car':9,
         'food':10,'entertainment':11,'finance':12,'fashion':13,
